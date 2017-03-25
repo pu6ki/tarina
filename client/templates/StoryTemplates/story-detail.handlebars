@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col s12">
+        <div class="card blue-grey blue-grey lighten-5">
+            <div class="card-content center-align blue-text">
+                <span class="card-title"><b>{{title}}</b></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col s12 center-align story-content-container">
+    <div class="card blue-grey blue-grey lighten-5">
+        <div class="card-content black-text">
+            <span class="card-title center-align storyline-container">
+                {{#each storyline_set}}
+                    <div class="author-container">
+                        <div class="hide" class="info-container" id="info-container-{{id}}">
+                            <div class="card-title center-align">
+                                <div class="chip">
+                                    <img src="{{author.profile_image}}" alt="Profile image">
+                                    <a href="#/profile/{{author.user.id}}"><b>{{author.user.username}}</b></a>
+                                </div>
+                            </div>
+
+                        </div>
+                        <span id="storyline-{{id}}" class="storyline">{{content}}</span>
+                    </div>
+                {{/each}}
+            </span>
+        </div>
+    </div>
+</div>

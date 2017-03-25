@@ -3,7 +3,8 @@ import { HeaderController } from './HeaderController.js';
 import { RegisterController } from './AuthControllers/RegisterController.js';
 import { LoginController } from './AuthControllers/LoginController.js';
 import { ProfileController } from './ProfileControllers/ProfileController.js';
-import { StoriesController } from './StoriesControllers/StoriesController.js'
+import { StoriesController } from './StoriesControllers/StoriesController.js';
+import { DetailedStoryController } from './StoriesControllers/DetailedStoryController.js' ;
  
 export let controllers = {
     home: HomeController,
@@ -11,5 +12,6 @@ export let controllers = {
     register: RegisterController,
     login: LoginController,
     profile: ProfileController,
-    stories: StoriesController
+    stories: StoriesController,
+    detailedStory: DetailedStoryController
 }

@@ -28,4 +28,7 @@ router
     .on('/stories', () => {
         controllers.stories();
     })
+    .on('/stories/:id', (params) => {
+        controllers.detailedStory(params.id);
+    })
     .resolve();
