@@ -151,6 +151,6 @@ main {
   display: inline;
 }
 
-#homeDescription {
-  padding-bottom: 30vh;
+.parallax-container {
+  min-height: 70vh !important;
 }
