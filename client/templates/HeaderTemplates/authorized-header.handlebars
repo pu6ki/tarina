@@ -1,0 +1,26 @@
+<nav class="blue darken-3">
+    <a href="/#/home" class="brand-logo">Tarina</a>
+    <a href="#" data-activates="mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+
+    <ul class="right hide-on-med-and-down">
+        <li>
+            <a class="dropdown-button" data-activates="storyDropdown">
+                <i class="material-icons left">question_answer</i>Stories<i class="material-icons right">arrow_drop_down</i>
+            </a>
+            <ul id="storyDropdown" class="dropdown-content">
+                <li><a href="#/stories" id="story" class="stories-menu">All stories</a></li>
+                <li class="divider"></li>
+                <li><a href="#/stories/personal" class="stories-menu">My stories</a></li>
+            </ul>
+        </li>
+        <li><a href="#/profile/{{id}}"><i class="material-icons left">perm_identity</i>{{username}}</a></li>
+        <li><a href="#" class="logout">Logout</a></li>
+    </ul>
+
+    <ul class="side-nav" id="mobile">
+        <li><a href="#/stories" id="story">All stories</a></li>
+        <li><a href="#/stories/personal">My stories</a></li>
+        <li><a href="#/profile/{{id}}"><i class="material-icons left">perm_identity</i>{{username}}</a></li>
+        <li><a href="#" class="logout">Logout</a></li>
+    </ul>
+</nav>

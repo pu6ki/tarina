@@ -22,6 +22,15 @@ router
     .on('/register', () => {
         controllers.register();
     })
+    .on(`/profile/:id`, (params) => {
+        controllers.profile(params.id);
+    })
+    .on('/stories', () => {
+        controllers.stories();
+    })
+    .on('/stories/:id', (params) => {
+        controllers.detailedStory(params.id);
+    })
     .notFound(() => {
         controllers.notFound();
     })

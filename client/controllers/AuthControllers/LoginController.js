@@ -2,6 +2,9 @@ import { requester } from '../../utils/requester.js';
 import { templates } from '../../utils/templates.js';
 import { formHandler } from '../../utils/formHandler.js';
 
+import { HeaderController } from '../HeaderController.js';
+import { HomeController } from '../HomeController.js';
+
 export function LoginController() {
     templates.get('AuthTemplates/login-template')
         .then((result) => {
@@ -42,7 +45,9 @@ function login() {
             }
 
             Materialize.toast('Logged in successfully!', 3000, 'green accent-4');
-            window.location.href = '/#/home';
+            window.location.href = "/#/home";
+            HeaderController();
+            HomeController();
         })
         .catch((err) => {
             Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
