@@ -22,6 +22,10 @@ export function StoriesController(storiesUrl) {
         .then((result) => {
             let data = result[0],
                 hbTemplate = Handlebars.compile(result[1]);
+            
+            data.forEach((el) => {
+                el.starting = el.storyline_set[0].content.slice(0, 149).concat('...');
+            });
 
             let template = hbTemplate(data);
             $('#content').html(template);
