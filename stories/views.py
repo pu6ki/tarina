@@ -88,9 +88,16 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         'list': (IsAuthenticated,),
         'retrieve': (IsAuthenticated,),
         'create': (IsAuthenticated, IsNotBlacklisted),
-        'destroy': (IsAuthenticated,),
+        'destroy': (IsAuthenticated, IsAuthor),
     }
     serializer_class = StoryLineSerializer
+
+    def get_permissions(self):
+        return [
+            permission()
+            for permission
+            in self.permission_classes_by_action[self.action]
+        ]
 
     def list(self, request, story_pk=None):
         story = get_object_or_404(Story, id=story_pk)
@@ -165,13 +172,8 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
     def destroy(self, request, story_pk=None, pk=None):
         story = get_object_or_404(Story, id=story_pk)
         story_line = get_object_or_404(story.storyline_set, id=pk)
-
-        if request.user != story_line.author.user:
-            return Response(
-                {'message': 'You can delete only your own story lines.'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
+        self.check_object_permissions(request, story_line)
+        
         story_line.delete()
 
         return Response(
