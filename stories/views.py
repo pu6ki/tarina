@@ -6,7 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import StorySerializer
-from .models import Story
+from .models import Story, StoryLine
 
 
 class StoriesViewSet(viewsets.ModelViewSet):
@@ -41,5 +41,26 @@ class StoriesViewSet(viewsets.ModelViewSet):
         return Response(
             serializer.data,
             status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+
+class StoryLinesViewSet(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StorySerializer
+
+    def list(self, request, story_pk=None):
+        story = get_object_or_404(Story, id=story_pk)
+        self.check_object_permissions(request, story)
+
+        storylines = StoryLine.objects.filter(story=story)
+        serializer = self.serializer_class(storylines, many=True)
+
+        headers = self.get_success_headers(serializer)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
             headers=headers
         )
