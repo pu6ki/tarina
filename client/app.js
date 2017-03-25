@@ -26,7 +26,10 @@ router
         controllers.profile(params.id);
     })
     .on('/stories', () => {
-        controllers.stories();
+        controllers.stories(storiesUrl);
+    })
+    .on('/stories/personal',() => {
+        controllers.stories(storiesUrl.concat('personal/'));
     })
     .on('/stories/:id', (params) => {
         controllers.detailedStory(params.id);

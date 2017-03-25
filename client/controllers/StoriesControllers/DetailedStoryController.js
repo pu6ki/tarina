@@ -1,5 +1,6 @@
 import { requester } from '../../utils/requester.js';
 import { templates } from '../../utils/templates.js';
+
 import { NotFoundController } from '../NotFoundController.js';
 
 export function DetailedStoryController(id) {
@@ -15,15 +16,16 @@ export function DetailedStoryController(id) {
             let data = result[0],
                 hbTemplate = Handlebars.compile(result[1]);
 
-            console.log(data);
             let template = hbTemplate(data);
             $('#content').html(template);
 
-            data.storyline_set.forEach((el) => {
-                $(`.storyline-container #storyline-${el.id}`).on('click', () => {
-                    $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
+            if (data.storyline_set) {
+                data.storyline_set.forEach((el) => {
+                    $(`.storyline-container #storyline-${el.id}`).on('click', () => {
+                        $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
+                    });
                 });
-            });
+            }
 
         }).catch((err) => {
             console.log(err);
