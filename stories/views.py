@@ -8,14 +8,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import StorySerializer, StoryLineSerializer
 from .models import Story, StoryLine
-from .permissions import IsAuthor, IsNotBlacklisted, IsBlacklisted
+from .permissions import IsAuthor
 
 
 class StoriesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes_by_action = {
         'list': (IsAuthenticated,),
-        'retrieve': (IsAuthenticated, IsNotBlacklisted),
+        'retrieve': (IsAuthenticated),
         'create': (IsAuthenticated,),
         'destroy': (IsAuthenticated, IsAuthor),
     }
@@ -84,7 +84,7 @@ class UserBlockingView(generics.UpdateAPIView):
 
 
 class UserBlock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor, IsNotBlacklisted)
+    permission_classes = (IsAuthenticated, IsAuthor)
 
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
@@ -92,10 +92,15 @@ class UserBlock(UserBlockingView):
         users = User.objects.exclude(id=story.author.user.pk)
         user = get_object_or_404(users, id=user_pk)
 
-        request.user = user
         self.check_object_permissions(request, story)
 
-        story.blacklist.remove(user)
+        if user in story.blacklist.all():
+            return Response(
+                {'message': 'User is already blocked.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        story.blacklist.add(user)
 
         return Response(
             {'message': self.get_response_message(user)},
@@ -104,18 +109,21 @@ class UserBlock(UserBlockingView):
 
 
 class UserUnblock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor, IsBlacklisted)
+    permission_classes = (IsAuthenticated, IsAuthor)
 
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
+        user = get_object_or_404(User, id=user_pk)
 
-        users = User.objects.exclude(id=story.author.user.pk)
-        user = get_object_or_404(users, id=user_pk)
-
-        request.user = user
         self.check_object_permissions(request, story)
 
-        story.blacklist.add(user)
+        if user not in story.blacklist.all():
+            return Response(
+                {'message': 'User is not blocked yet.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        story.blacklist.remove(user)
 
         return Response(
             {'message': self.get_response_message(user)},
@@ -171,8 +179,11 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
 
         headers = self.get_success_headers(serializer)
 
+        resp_data = serializer.data
+        resp_data['story_id'] = int(story.id)
+
         return Response(
-            serializer.data,
+            resp_data,
             status=status.HTTP_201_CREATED,
             headers=headers
         )

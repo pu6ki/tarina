@@ -4,7 +4,7 @@ from rest_framework_nested import routers
 
 from .views import (
     StoriesViewSet, StoryLinesViewSet,
-    UserBlock
+    UserBlock, UserUnblock
 )
 
 
@@ -23,6 +23,11 @@ urlpatterns = [
         r'^story/(?P<pk>[0-9]+)/block/(?P<user_pk>[0-9]+)/',
         UserBlock.as_view(),
         name='block'
+    ),
+    url(
+        r'^story/(?P<pk>[0-9]+)/unblock/(?P<user_pk>[0-9]+)/',
+        UserUnblock.as_view(),
+        name='unblock'
     )
 ]
 urlpatterns += story_router.urls
