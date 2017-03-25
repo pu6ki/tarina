@@ -37,8 +37,11 @@ class StoriesViewSet(viewsets.ModelViewSet):
 
         headers = self.get_success_headers(serializer)
 
+        resp_data = serializer.data
+        resp_data['have_voted'] = story.votes.exists(request.user.pk)
+
         return Response(
-            serializer.data,
+            resp_data,
             status=status.HTTP_200_OK,
             headers=headers
         )
@@ -202,7 +205,7 @@ class StoryVoting(generics.UpdateAPIView):
         unvote_msg = 'You haven\'t voted for this story yet.'
         vote_msg = 'You have already voted for this story.'
 
-        return vote_msg if self.get_view_name().endswith('Unvote') else unvote_msg
+        return unvote_msg if self.get_view_name().endswith('Unvote') else vote_msg
 
     def update(self, request, pk=None, *args, **kwargs):
         raise NotImplementedError()
