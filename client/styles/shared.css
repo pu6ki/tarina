@@ -150,3 +150,7 @@ main {
 .material-icons.nav-icon {
   display: inline;
 }
+
+#homeDescription {
+  padding-bottom: 30vh;
+}
