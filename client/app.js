@@ -22,4 +22,7 @@ router
     .on('/register', () => {
         controllers.register();
     })
+    .notFound(() => {
+        controllers.notFound();
+    })
     .resolve();
