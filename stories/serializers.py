@@ -5,11 +5,12 @@ from .models import Story, StoryLine
 
 
 class StoryLineSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
     content = serializers.CharField(min_length=3, max_length=250)
 
     class Meta:
         model = StoryLine
-        fields = ('id', 'content', 'posted_on')
+        fields = ('id', 'author', 'content', 'posted_on')
 
     def create(self, validated_data):
         request = self.context['request']
