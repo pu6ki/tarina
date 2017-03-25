@@ -33,6 +33,7 @@ main {
   box-shadow: none;
 }
 
+<<<<<<< HEAD
 .login-form {
   display: inline-block;
   padding: 64px 72px 0px 72px;
@@ -114,4 +115,24 @@ main {
 .story-content-container {
   margin-left: 5%;
   margin-right: 5%;
+}
+
+#image-container {
+  background-image: url("../images/goback.jpg");
+  background-size: cover;
+  width: 99.99vw;
+  height: 90.9vh;
+  text-align: center;
+  color: white;
+}
+
+#image-container > .waves-effect {
+  margin-top: 50px;
+  background-color: white;
+  color: #1565c0;
+  
+}
+
+.large-font {
+  font-size: 20px;
 }

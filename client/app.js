@@ -31,4 +31,7 @@ router
     .on('/stories/:id', (params) => {
         controllers.detailedStory(params.id);
     })
+    .notFound(() => {
+        controllers.notFound();
+    })
     .resolve();

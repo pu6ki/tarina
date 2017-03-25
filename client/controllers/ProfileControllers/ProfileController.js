@@ -1,5 +1,7 @@
 import { requester } from '../../utils/requester.js';
 import { templates } from '../../utils/templates.js';
+import { NotFoundController } from '../NotFoundController.js';
+
 
 export function ProfileController(id) {
     let profileUrl = `https://tarina.herokuapp.com/api/profile/${id}/`,
@@ -17,7 +19,7 @@ export function ProfileController(id) {
             //     EditProfileController(id);
             // });
         }).catch((err) => {
-            // NotFoundController();
+            NotFoundController();
             console.log(err);
         });
 }

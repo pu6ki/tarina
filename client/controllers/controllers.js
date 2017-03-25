@@ -5,7 +5,8 @@ import { LoginController } from './AuthControllers/LoginController.js';
 import { ProfileController } from './ProfileControllers/ProfileController.js';
 import { StoriesController } from './StoriesControllers/StoriesController.js';
 import { DetailedStoryController } from './StoriesControllers/DetailedStoryController.js' ;
- 
+import { NotFoundController } from './NotFoundController.js';
+
 export let controllers = {
     home: HomeController,
     header: HeaderController,
@@ -13,5 +14,6 @@ export let controllers = {
     login: LoginController,
     profile: ProfileController,
     stories: StoriesController,
-    detailedStory: DetailedStoryController
+    detailedStory: DetailedStoryController,
+    notFound: NotFoundController
 }

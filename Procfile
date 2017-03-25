@@ -1,0 +1,1 @@
+web: gunicorn tarina.wsgi --log-file -

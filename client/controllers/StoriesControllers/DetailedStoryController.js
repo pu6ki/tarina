@@ -1,5 +1,6 @@
 import { requester } from '../../utils/requester.js';
 import { templates } from '../../utils/templates.js';
+import { NotFoundController } from '../NotFoundController.js';
 
 export function DetailedStoryController(id) {
     let token = localStorage.getItem('tarina-token');
@@ -26,6 +27,6 @@ export function DetailedStoryController(id) {
 
         }).catch((err) => {
             console.log(err);
-            // NotFoundController();
+            NotFoundController();
         });
 }
