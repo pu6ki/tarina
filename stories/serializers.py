@@ -9,6 +9,16 @@ class StoryLineSerializer(serializers.ModelSerializer):
         model = StoryLine
         fields = ('id', 'content', 'posted_on')
 
+    def create(self, validated_data):
+        request = self.context['request']
+        story = self.context['story']
+
+        author = request.user.author
+
+        return StoryLine.objects.create(
+            story=story, author=author, **validated_data
+        )
+
 
 class StorySerializer(serializers.ModelSerializer):
     title = serializers.CharField(min_length=3, max_length=100)
