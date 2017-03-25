@@ -134,7 +134,7 @@ main {
 }
 
 .large-font {
-  font-size: 20px;
+  font-size: 30px;
 }
 
 #error-text {
@@ -147,11 +147,19 @@ main {
     1px 1px 0 #000;
 }
 
-.delete-storyline-button i{
+.delete-storyline-button i {
   color: red;
   display: inline;
 }
 
-.delete-storyline-button:hover{
+.delete-storyline-button:hover {
   cursor: pointer;
+}
+
+.material-icons.nav-icon {
+  display: inline;
+}
+
+.parallax-container {
+  min-height: 85vh !important;
 }

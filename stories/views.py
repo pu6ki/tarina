@@ -82,6 +82,18 @@ class PersonalStoryList(generics.ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class TrendingStoryList(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StorySerializer
+
+    def get(self, request):
+        stories = Story.objects.order_by('num_vote_up', '-posted_on')[:10]
+        serializer = self.serializer_class(stories, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class StoryLinesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes_by_action = {
@@ -172,7 +184,7 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
     def destroy(self, request, story_pk=None, pk=None):
         story = get_object_or_404(Story, id=story_pk)
         story_line = get_object_or_404(story.storyline_set, id=pk)
-        self.check_object_permissions(request, story_line)
+        self.check_object_permissions(request, story)
 
         story_line.delete()
 
