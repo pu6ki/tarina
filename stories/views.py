@@ -182,10 +182,21 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         )
 
 
-class StoryVote(generics.UpdateAPIView):
+class StoryVoting(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsNotBlacklisted)
 
+    def get_error_message(self):
+        unvote_msg = 'You haven\'t voted for this story yet.'
+        vote_msg = 'You have already voted for this story.'
+
+        return vote_msg if self.get_view_name().endswith('Unvote') else unvote_msg
+
+    def update(self, request, pk=None, *args, **kwargs):
+        raise NotImplementedError()
+
+
+class StoryVote(StoryVoting):
     def update(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         self.check_object_permissions(request, story)
@@ -194,7 +205,7 @@ class StoryVote(generics.UpdateAPIView):
 
         if story.votes.exists(user_id):
             return Response(
-                {'message': 'You have already voted for this story.'},
+                {'message': self.get_error_message()},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -206,10 +217,7 @@ class StoryVote(generics.UpdateAPIView):
         )
 
 
-class StoryUnvote(generics.UpdateAPIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsNotBlacklisted)
-
+class StoryUnvote(StoryVoting):
     def update(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         self.check_object_permissions(request, story)
@@ -218,7 +226,7 @@ class StoryUnvote(generics.UpdateAPIView):
 
         if not story.votes.exists(user_id):
             return Response(
-                {'message': 'You haven\'t voted for this story yet.'},
+                {'message': self.get_error_message()},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -232,6 +240,7 @@ class StoryUnvote(generics.UpdateAPIView):
 
 class UserBlockingView(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, IsAuthor)
 
     def get_response_message(self, user):
         return 'User {} has been successfuly {}.'.format(
@@ -244,8 +253,6 @@ class UserBlockingView(generics.UpdateAPIView):
 
 
 class UserBlock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor)
-
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
 
@@ -269,8 +276,6 @@ class UserBlock(UserBlockingView):
 
 
 class UserUnblock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor)
-
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         user = get_object_or_404(User, id=user_pk)
