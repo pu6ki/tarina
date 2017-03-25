@@ -12,7 +12,6 @@ export function ProfileController(id) {
                 hbTemplate = Handlebars.compile(result[1]),
                 template = hbTemplate(data);
 
-            console.log(data);
             $('#content').html(template);
             // $('#edit-profile').on('click', () => {
             //     EditProfileController(id);

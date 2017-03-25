@@ -88,3 +88,30 @@ main {
 .brand-logo {
   margin-left: 10px;
 }
+
+.storyline-container {
+  color: #1565c0;
+  font-size: 16px !important;
+  font-style: italic;
+  font-weight: 400 !important;
+}
+
+.storyline-container span:hover {
+  background-color: #bbdefb;  
+}
+
+.author-container {
+  display: inline;
+  position: relative;
+}
+
+.visible {
+  position: absolute;
+  top: -40px;
+  left: 10px;
+}
+
+.story-content-container {
+  margin-left: 5%;
+  margin-right: 5%;
+}
