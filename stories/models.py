@@ -11,7 +11,7 @@ class Story(models.Model):
     blacklist = models.ManyToManyField(User)
 
     class Meta:
-        ordering = ['posted_on']
+        ordering = ['-posted_on']
         verbose_name_plural = 'stories'
 
     def __str__(self):
