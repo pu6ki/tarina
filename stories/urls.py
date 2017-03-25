@@ -3,7 +3,7 @@ from django.conf.urls import url
 from rest_framework_nested import routers
 
 from .views import (
-    StoriesViewSet, StoryLinesViewSet,
+    StoriesViewSet, PersonalStoryList, StoryLinesViewSet,
     UserBlock, UserUnblock
 )
 
@@ -19,6 +19,9 @@ storylines_router.register(
 )
 
 urlpatterns = [
+    url(
+        r'^story/personal/', PersonalStoryList.as_view(), name='personal'
+    ),
     url(
         r'^story/(?P<pk>[0-9]+)/block/(?P<user_pk>[0-9]+)/',
         UserBlock.as_view(),

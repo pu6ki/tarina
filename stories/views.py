@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import StorySerializer, StoryLineSerializer
 from .models import Story, StoryLine
-from .permissions import IsAuthor
+from .permissions import IsAuthor, IsNotBlacklisted
 
 
 class StoriesViewSet(viewsets.ModelViewSet):
@@ -66,6 +66,116 @@ class StoriesViewSet(viewsets.ModelViewSet):
 
         return Response(
             {'message': 'Story successfuly deleted.'},
+            status=status.HTTP_200_OK
+        )
+
+
+class PersonalStoryList(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StorySerializer
+
+    def get(self, request):
+        stories = Story.objects.filter(author=request.user.author)
+        serializer = self.serializer_class(stories, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class StoryLinesViewSet(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes_by_action = {
+        'list': (IsAuthenticated,),
+        'retrieve': (IsAuthenticated,),
+        'create': (IsAuthenticated, IsNotBlacklisted),
+        'destroy': (IsAuthenticated,),
+    }
+    serializer_class = StoryLineSerializer
+
+    def list(self, request, story_pk=None):
+        story = get_object_or_404(Story, id=story_pk)
+        self.check_object_permissions(request, story)
+
+        storylines = StoryLine.objects.filter(story=story)
+        serializer = self.serializer_class(storylines, many=True)
+
+        headers = self.get_success_headers(serializer)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
+
+    def retrieve(self, request, story_pk=None, pk=None):
+        story = get_object_or_404(Story, id=story_pk)
+        self.check_object_permissions(request, story)
+
+        storyline = get_object_or_404(story.storyline_set, id=pk)
+        serializer = self.serializer_class(storyline)
+
+        headers = self.get_success_headers(serializer)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
+
+    def create(self, request, story_pk=None, *args, **kwargs):
+        story = get_object_or_404(Story, id=story_pk)
+        self.check_object_permissions(request, story)
+
+        story_lines = StoryLine.objects.filter(story=story)
+        user_story_lines = story_lines.filter(author=request.user.author)
+
+        if story_lines:
+            msg = ''
+
+            if story_lines.last() == user_story_lines.last():
+                msg = 'You are not allowed to add two consecutive story lines.'
+            elif story_lines.filter(content=request.data['content']):
+                msg = 'Identical story line already exists.'
+            elif len(story_lines) == 30:
+                msg = 'Max number of stories reached.'
+
+            if msg:
+                return Response(
+                    {'message': msg},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+        context = {'request': request, 'story': story}
+
+        serializer = self.serializer_class(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer)
+
+        resp_data = serializer.data
+        resp_data['story_id'] = int(story.id)
+
+        return Response(
+            resp_data,
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+    def destroy(self, request, story_pk=None, pk=None):
+        story = get_object_or_404(Story, id=story_pk)
+        story_line = get_object_or_404(story.storyline_set, id=pk)
+
+        if request.user != story_line.author.user:
+            return Response(
+                {'message': 'You can delete only your own story lines.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        story_line.delete()
+
+        return Response(
+            {'message': 'Story line successfuly deleted.'},
             status=status.HTTP_200_OK
         )
 
@@ -129,81 +239,3 @@ class UserUnblock(UserBlockingView):
             {'message': self.get_response_message(user)},
             status=status.HTTP_200_OK
         )
-
-
-class StoryLinesViewSet(viewsets.ModelViewSet):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = StoryLineSerializer
-
-    def list(self, request, story_pk=None):
-        story = get_object_or_404(Story, id=story_pk)
-        self.check_object_permissions(request, story)
-
-        storylines = StoryLine.objects.filter(story=story)
-        serializer = self.serializer_class(storylines, many=True)
-
-        headers = self.get_success_headers(serializer)
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-            headers=headers
-        )
-
-
-    def retrieve(self, request, story_pk=None, pk=None):
-        story = get_object_or_404(Story, id=story_pk)
-        self.check_object_permissions(request, story)
-
-        storyline = get_object_or_404(story.storyline_set, id=pk)
-        serializer = self.serializer_class(storyline)
-
-        headers = self.get_success_headers(serializer)
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-            headers=headers
-        )
-
-    def create(self, request, story_pk=None, *args, **kwargs):
-        story = get_object_or_404(Story, id=story_pk)
-        self.check_object_permissions(request, story)
-
-        story_lines = story.storyline_set
-        user_story_lines = story_lines.filter(author=request.user.author)
-
-        if story_lines:
-            msg = ''
-
-            if story_lines.last() == user_story_lines.last():
-                msg = 'You are not allowed to add two consecutive story lines.'
-            elif story_lines.filter(content=request.data['content']):
-                msg = 'Identical story line already exists.'
-            elif len(story_lines) == 30:
-                msg = 'Max number of stories reached.'
-
-            if msg:
-                return Response(
-                    {'message': msg},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
-        context = {'request': request, 'story': story}
-
-        serializer = self.serializer_class(data=request.data, context=context)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
-        headers = self.get_success_headers(serializer)
-
-        resp_data = serializer.data
-        resp_data['story_id'] = int(story.id)
-
-        return Response(
-            resp_data,
-            status=status.HTTP_201_CREATED,
-            headers=headers
-        )
-
