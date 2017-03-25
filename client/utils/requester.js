@@ -68,6 +68,27 @@ let requester = {
             });
         });
         return promise;
+    },
+    delete(url) {
+        let promise = new Promise((resolve, reject) => {
+            $.ajax({
+                url,
+                method: "DELETE",
+                beforeSend: (xhr) => {
+                    if (window.localStorage.getItem('tarina-token')) {
+                        let token = window.localStorage.getItem('tarina-token');
+                        xhr.setRequestHeader('Authorization', `Token ${token}`);
+                    }
+                },
+                success(response) {
+                    return resolve(response);
+                },
+                error(response) {
+                    return reject(response);
+                }
+            });
+        });
+        return promise;
     }
 };
 
