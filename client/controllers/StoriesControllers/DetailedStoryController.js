@@ -19,9 +19,10 @@ export function DetailedStoryController(id) {
 
             data.editable = username === data.author.user.username;
 
+            console.log(data);
+
             let template = hbTemplate(data);
             $('#content').html(template);
-
 
             if (data.storyline_set) {
                 data.storyline_set.forEach((el) => {
