@@ -1,5 +1,6 @@
 import { requester } from '../utils/requester.js';
 import { templates } from '../utils/templates.js';
+import { LogoutController } from './AuthControllers/LogoutController.js';
 
 export function HeaderController() {
     let token = localStorage.getItem('tarina-token');
@@ -22,6 +23,10 @@ export function HeaderController() {
                 $('.dropdown-button').dropdown({
                     belowOrigin: true
                 });
+                $('.logout').on('click', () => {
+                    LogoutController();
+                    Materialize.toast('Logged out successfully!', 3000, 'green accent-4');
+                })
             })
     } else {
         templates.get('HeaderTemplates/unauthorized-header')

@@ -32,3 +32,59 @@ main {
   border-bottom: 2px solid #1565c0 !important;
   box-shadow: none;
 }
+
+.login-form {
+  display: inline-block;
+  padding: 64px 72px 0px 72px;
+  border: 1px solid #EEE;
+}
+
+.register-form,
+.add-story {
+  display: inline-block;
+  width: 55vw;
+  padding: 32px 48px 0px 48px;
+  border: 1px solid #EEE;
+}
+
+.profile-text {
+  color: black !important;
+}
+
+.collection-item > .title {
+  font-size: 17px !important;
+}
+
+.collection-item {
+  border-width: 50px;
+}
+
+.stories-menu {
+  color: #1565c0 !important;
+}
+
+.storyline-container {
+  min-height: 100px !important;
+}
+
+.card-action a {
+  color: #1565c0 !important;
+}
+
+.posted_on {
+  display: block;
+  float: right;
+}
+
+.likes {
+  display: block;
+  float: left; 
+}
+
+.details-container {
+  margin-bottom: 1em;
+}
+
+.brand-logo {
+  margin-left: 10px;
+}
