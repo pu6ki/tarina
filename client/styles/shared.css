@@ -147,3 +147,6 @@ main {
     1px 1px 0 #000;
 }
 
+.material-icons.nav-icon {
+  display: inline;
+}
