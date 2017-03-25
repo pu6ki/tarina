@@ -30,7 +30,9 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ('id', 'title', 'author', 'posted_on', 'storyline_set')
+        fields = (
+            'id', 'title', 'author', 'posted_on', 'num_vote_up', 'storyline_set'
+        )
 
     def create(self, validated_data):
         request = self.context['request']

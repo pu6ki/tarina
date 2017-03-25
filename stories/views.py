@@ -180,6 +180,54 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         )
 
 
+class StoryVote(generics.UpdateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, IsNotBlacklisted)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        story = get_object_or_404(Story, id=pk)
+        self.check_object_permissions(request, story)
+
+        user_id = request.user.id
+
+        if story.votes.exists(user_id):
+            return Response(
+                {'message': 'You have already voted for this story.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        story.votes.up(user_id)
+
+        return Response(
+            {'num_vote_up': story.votes.count()},
+            status=status.HTTP_200_OK
+        )
+
+
+class StoryUnvote(generics.UpdateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, IsNotBlacklisted)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        story = get_object_or_404(Story, id=pk)
+        self.check_object_permissions(request, story)
+
+        user_id = request.user.id
+
+        if not story.votes.exists(user_id):
+            return Response(
+                {'message': 'You haven\'t voted for this story yet.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        story.votes.delete(user_id)
+
+        return Response(
+            {'num_vote_up': story.votes.count()},
+            status=status.HTTP_200_OK
+        )
+
+
 class UserBlockingView(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
 
