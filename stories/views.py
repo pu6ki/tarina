@@ -184,7 +184,7 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
     def destroy(self, request, story_pk=None, pk=None):
         story = get_object_or_404(Story, id=story_pk)
         story_line = get_object_or_404(story.storyline_set, id=pk)
-        self.check_object_permissions(request, story_line)
+        self.check_object_permissions(request, story)
 
         story_line.delete()
 
