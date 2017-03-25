@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from users.models import Author
 
@@ -7,6 +8,7 @@ class Story(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     posted_on = models.DateTimeField(auto_now_add=True)
+    blacklist = models.ManyToManyField(User)
 
     class Meta:
         ordering = ['-posted_on']
