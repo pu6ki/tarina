@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer,
-    AuthorProfileSerializer
+    AuthorSerializer
 )
 from .models import Author
 
@@ -63,7 +63,7 @@ class UserLogin(generics.CreateAPIView):
 
 
 class AuthorProfile(generics.RetrieveAPIView):
-    serializer_class = AuthorProfileSerializer
+    serializer_class = AuthorSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 

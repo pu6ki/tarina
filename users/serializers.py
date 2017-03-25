@@ -66,7 +66,7 @@ class UserReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name')
 
 
-class AuthorProfileSerializer(serializers.ModelSerializer):
+class AuthorSerializer(serializers.ModelSerializer):
     user = UserReadSerializer()
     profile_image = serializers.URLField()
 
