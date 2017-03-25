@@ -10,7 +10,7 @@ class Story(VoteModel, models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     posted_on = models.DateTimeField(auto_now_add=True)
-    blacklist = models.ManyToManyField(User)
+    blacklist = models.ManyToManyField(User, blank=True)
 
     class Meta:
         ordering = ['-posted_on']
