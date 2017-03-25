@@ -22,4 +22,10 @@ router
     .on('/register', () => {
         controllers.register();
     })
+    .on(`/profile/:id`, (params) => {
+        controllers.profile(params.id);
+    })
+    .on('/stories', () => {
+        controllers.stories();
+    })
     .resolve();
