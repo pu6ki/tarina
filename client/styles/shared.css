@@ -134,7 +134,7 @@ main {
 }
 
 .large-font {
-  font-size: 20px;
+  font-size: 30px;
 }
 
 #error-text {
@@ -152,5 +152,5 @@ main {
 }
 
 .parallax-container {
-  min-height: 70vh !important;
+  min-height: 85vh !important;
 }
