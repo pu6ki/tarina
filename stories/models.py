@@ -11,7 +11,7 @@ class Story(models.Model):
     blacklist = models.ManyToManyField(User)
 
     class Meta:
-        ordering = ['-posted_on']
+        ordering = ['posted_on']
         verbose_name_plural = 'stories'
 
     def __str__(self):
@@ -25,7 +25,7 @@ class StoryLine(models.Model):
     posted_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-posted_on']
+        ordering = ['posted_on']
 
     def __str__(self):
         return 'Story line #{} - {}'.format(self.id, self.story)
