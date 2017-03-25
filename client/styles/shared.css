@@ -33,7 +33,6 @@ main {
   box-shadow: none;
 }
 
-<<<<<<< HEAD
 .login-form {
   display: inline-block;
   padding: 64px 72px 0px 72px;
@@ -110,6 +109,7 @@ main {
   position: absolute;
   top: -40px;
   left: 10px;
+  min-width: 120px;
 }
 
 .story-content-container {
@@ -145,4 +145,13 @@ main {
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+
+.delete-storyline-button i{
+  color: red;
+  display: inline;
+}
+
+.delete-storyline-button:hover{
+  cursor: pointer;
 }

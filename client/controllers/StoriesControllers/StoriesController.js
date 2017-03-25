@@ -21,7 +21,7 @@ export function StoriesController(storiesUrl) {
 
             let template = hbTemplate(data);
             $('#content').html(template);
-
+            
             $('#add-story').on('click', () => {
                 AddStoryController();
             });

@@ -8,6 +8,7 @@
     </div>
 </div>
 
+{{#if}}
 <div class="col s12 center-align story-content-container">
     <div class="card blue-grey blue-grey lighten-5">
         <div class="card-content black-text">
@@ -20,8 +21,11 @@
                                     <img src="{{author.profile_image}}" alt="Profile image">
                                     <a href="#/profile/{{author.user.id}}"><b>{{author.user.username}}</b></a>
                                 </div>
-                            </div>
 
+                                {{#if ../editable}}
+                                    <span class="delete-storyline-button" id="delete-{{../id}}-storyline-{{id}}"><i class="material-icons">not_interested</i></span>
+                                {{/if}}
+                            </div>
                         </div>
                         <span id="storyline-{{id}}" class="storyline">{{content}}</span>
                     </div>
@@ -30,3 +34,6 @@
         </div>
     </div>
 </div>
+{{else}}
+
+{{/if}}
