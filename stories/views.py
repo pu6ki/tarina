@@ -173,7 +173,7 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         story = get_object_or_404(Story, id=story_pk)
         story_line = get_object_or_404(story.storyline_set, id=pk)
         self.check_object_permissions(request, story_line)
-        
+
         story_line.delete()
 
         return Response(
