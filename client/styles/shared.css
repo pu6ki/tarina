@@ -117,6 +117,12 @@ main {
   margin-right: 5%;
 }
 
+.add-storyline-container {
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-top: 5%
+}
+
 #image-container {
   background-image: url("../images/goback.jpg");
   background-size: cover;
@@ -163,3 +169,4 @@ main {
 .parallax-container {
   min-height: 85vh !important;
 }
+

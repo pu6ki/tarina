@@ -39,7 +39,7 @@ function getInitialStorylineFromTemplate() {
     if (validator.storyline($('#initial-storyline').val())) {
         data.content = $('#initial-storyline').val();
     } else {
-        Materialize.toast('Title should be between 3 and 250 characters long.', 3000, 'red accent-2');
+        Materialize.toast('Storyline should be between 3 and 250 characters long.', 3000, 'red accent-2');
         return;
     }
 

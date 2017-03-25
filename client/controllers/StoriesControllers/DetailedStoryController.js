@@ -1,5 +1,7 @@
 import { requester } from '../../utils/requester.js';
 import { templates } from '../../utils/templates.js';
+import { validator } from '../../utils/validator.js';
+import { formHandler } from '../../utils/formHandler.js';
 
 import { DeleteStorylineController } from './DeleteStorylineController.js';
 import { NotFoundController } from '../NotFoundController.js';
@@ -36,8 +38,37 @@ export function DetailedStoryController(id) {
                 });
             }
 
+            formHandler();
+
+            $('#add-storyline').on('click', () => {
+                addStoryline(id);
+            })
+
         }).catch((err) => {
-            console.log(err);
             NotFoundController();
+            console.log(err);
+        });
+}
+
+function addStoryline(id) {
+    const storyUrl = `http://tarina.herokuapp.com/api/story/${id}/storylines/`;
+
+    let data = {
+        content: ''
+    }
+
+    if (validator.storyline($('#new-storyline').val())) {
+        data.content = $('#new-storyline').val();
+    } else {
+        Materialize.toast('Storyline should be between 3 and 250 characters long.', 3000, 'red accent-2');
+        return;
+    }
+
+    requester.postJSON(storyUrl, data)
+        .then((result) => {
+            Materialize.toast('Storyline added successfully.', 3000, 'green accent-4');
+        }).catch((err) => {
+            Materialize.toast('You are not allowed to add two consecutive story lines.', 3000, 'red accent-2');
+            return;
         });
 }
