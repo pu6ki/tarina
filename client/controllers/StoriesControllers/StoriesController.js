@@ -7,13 +7,17 @@ import { NotFoundController } from '../NotFoundController.js';
 export function StoriesController(storiesUrl) {
     let token = localStorage.getItem('tarina-token');
 
-    let templateName = (storiesUrl.endsWith('/personal/')) ?
-        'personal-story-list' :
-        'story-list';
-    
+    let templateName = 'story-list';
+
+    if(storiesUrl.endsWith('/personal/')) {
+        templateName = 'personal-story-list';
+    } else if (storiesUrl.endsWith('/trending/')) {
+        templateName = 'trending-story-list';
+    }
+
     let getData = requester.getJSON(storiesUrl);
     let getTemplate = templates.get('StoryTemplates/'.concat(templateName));
-    
+
     Promise.all([getData, getTemplate])
         .then((result) => {
             let data = result[0],

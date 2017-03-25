@@ -31,6 +31,9 @@ router
     .on('/stories/personal',() => {
         controllers.stories(storiesUrl.concat('personal/'));
     })
+    .on('/stories/trending', () => {
+        controllers.stories(storiesUrl.concat('trending/'));
+    })
     .on('/stories/:id', (params) => {
         controllers.detailedStory(params.id);
     })
