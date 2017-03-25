@@ -15,7 +15,7 @@ class StoriesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes_by_action = {
         'list': (IsAuthenticated,),
-        'retrieve': (IsAuthenticated),
+        'retrieve': (IsAuthenticated,),
         'create': (IsAuthenticated,),
         'destroy': (IsAuthenticated, IsAuthor),
     }
@@ -171,6 +171,25 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         story = get_object_or_404(Story, id=story_pk)
         self.check_object_permissions(request, story)
 
+        story_lines = story.storyline_set
+        user_story_lines = story_lines.filter(author=request.user.author)
+
+        if story_lines:
+            msg = ''
+
+            if story_lines.last() == user_story_lines.last():
+                msg = 'You are not allowed to add two consecutive story lines.'
+            elif story_lines.filter(content=request.data['content']):
+                msg = 'Identical story line already exists.'
+            elif len(story_lines) == 30:
+                msg = 'Max number of stories reached.'
+
+            if msg:
+                return Response(
+                    {'message': msg},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
         context = {'request': request, 'story': story}
 
         serializer = self.serializer_class(data=request.data, context=context)
@@ -187,3 +206,4 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
             headers=headers
         )
+
