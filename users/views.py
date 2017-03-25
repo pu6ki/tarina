@@ -1,10 +1,18 @@
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .serializers import (
+    UserRegistrationSerializer, UserLoginSerializer,
+    AuthorProfileSerializer
+)
+from .models import Author
 
 
 class UserRegistration(generics.CreateAPIView):
@@ -52,3 +60,17 @@ class UserLogin(generics.CreateAPIView):
         }
 
         return Response(resp_data, status=status.HTTP_200_OK, headers=headers)
+
+
+class AuthorProfile(generics.RetrieveAPIView):
+    serializer_class = AuthorProfileSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def retrieve(self, request, user_pk=None, *args, **kwargs):
+        user = get_object_or_404(User, id=user_pk)
+        author = get_object_or_404(Author, user=user)
+
+        serializer = self.serializer_class(author)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
