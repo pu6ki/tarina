@@ -58,3 +58,18 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'password')
+
+
+class UserReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name')
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    user = UserReadSerializer()
+    profile_image = serializers.URLField()
+
+    class Meta:
+        model = Author
+        fields = ('user', 'profile_image')
