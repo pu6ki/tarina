@@ -88,7 +88,7 @@ class TrendingStoryList(generics.ListAPIView):
     serializer_class = StorySerializer
 
     def get(self, request):
-        stories = Story.objects.order_by('num_vote_up')[:10]
+        stories = Story.objects.order_by('num_vote_up', '-posted_on')[:10]
         serializer = self.serializer_class(stories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
