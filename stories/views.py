@@ -64,3 +64,19 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK,
             headers=headers
         )
+
+
+    def retrieve(self, request, story_pk=None, pk=None):
+        story = get_object_or_404(Story, id=story_pk)
+        self.check_object_permissions(request, story)
+
+        storyline = get_object_or_404(story.storyline_set, id=pk)
+        serializer = self.serializer_class(storyline)
+
+        headers = self.get_success_headers(serializer)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
