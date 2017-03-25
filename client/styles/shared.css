@@ -1,0 +1,34 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: #fff;
+}
+main {
+  flex: 1 0 auto;
+}
+
+.input-field input[type=date]:focus + label,
+.input-field input[type=text]:focus + label,
+.input-field input[type=email]:focus + label,
+.input-field input[type=password]:focus + label,
+.input-field textarea:focus + label {
+  color: #1565c0 !important;
+}
+
+.material-icons.prefix {
+  color: black;
+}
+
+.material-icons.prefix.active {
+  color: #1565c0;
+}
+
+.input-field input[type=date]:focus,
+.input-field input[type=text]:focus,
+.input-field input[type=email]:focus,
+.input-field input[type=password]:focus,
+.input-field textarea:focus {
+  border-bottom: 2px solid #1565c0 !important;
+  box-shadow: none;
+}
