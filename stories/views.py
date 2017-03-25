@@ -197,9 +197,6 @@ class StoryVoting(generics.UpdateAPIView):
 
 
 class StoryVote(StoryVoting):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsNotBlacklisted)
-
     def update(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         self.check_object_permissions(request, story)
@@ -221,9 +218,6 @@ class StoryVote(StoryVoting):
 
 
 class StoryUnvote(StoryVoting):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated, IsNotBlacklisted)
-
     def update(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         self.check_object_permissions(request, story)
@@ -246,6 +240,7 @@ class StoryUnvote(StoryVoting):
 
 class UserBlockingView(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, IsAuthor)
 
     def get_response_message(self, user):
         return 'User {} has been successfuly {}.'.format(
@@ -258,8 +253,6 @@ class UserBlockingView(generics.UpdateAPIView):
 
 
 class UserBlock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor)
-
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
 
@@ -283,8 +276,6 @@ class UserBlock(UserBlockingView):
 
 
 class UserUnblock(UserBlockingView):
-    permission_classes = (IsAuthenticated, IsAuthor)
-
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         user = get_object_or_404(User, id=user_pk)
