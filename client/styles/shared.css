@@ -108,7 +108,7 @@ main {
 .visible {
   position: absolute;
   top: -55px;
-  left: 30%;
+  left: 1px;
   min-width: 120px;
 }
 
@@ -184,10 +184,6 @@ main {
   padding-right: 15px;
   border-radius: 30px;
   padding-top: 5px;
-}
-
-.likes-panel {
-  margin-left: 3%;
 }
 
 .likes-panel i:hover {

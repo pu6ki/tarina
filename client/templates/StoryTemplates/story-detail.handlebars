@@ -9,10 +9,10 @@
 </div>
 
 {{#if storyline_set}}
-<div class="col s12 center-align story-content-container">
+<div class="col s12 story-content-container">
     <div class="card blue-grey blue-grey lighten-5">
         <div class="card-content black-text">
-            <span class="card-title center-align storyline-container">
+            <span class="card-title storyline-container">
                 {{#each storyline_set}}
                     <div class="author-container">
                         <div class="hide" class="info-container" id="info-container-{{id}}">
@@ -25,7 +25,6 @@
 
                                     {{#if ../editable}}
                                         <span class="delete-storyline-button right" id="delete-{{../id}}-storyline-{{id}}"><i class="material-icons grey-text text-darken-2">delete</i></span>
-                                        <span class="block-user-button right"><i class="material-icons red-text red-darken-3">not_interested</i></span>
                                     {{/if}}
                                 </div>
                             </div>

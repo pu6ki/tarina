@@ -1,14 +1,16 @@
 <div class="author-container">
     <div class="hide" class="info-container" id="info-container-{{id}}">
-        <div class="card-title center-align">
-            <div class="chip">
-                <img src="{{author.profile_image}}" alt="Profile image">
-                <a href="#/profile/{{author.user.id}}"><b>{{author.user.username}}</b></a>
-            </div>
+        <div class="card-title left-align">
+            <div id="authorPanel">
+                <div class="chip">
+                    <img src="{{author.profile_image}}" alt="Profile image">
+                    <a href="#/profile/{{author.user.id}}"><b>{{author.user.username}}</b></a>
+                </div>
 
-            {{#if editable}}
-                <span class="delete-storyline-button" id="delete-{{../id}}-storyline-{{id}}"><i class="material-icons">not_interested</i></span>
-            {{/if}}
+                {{#if editable}}
+                    <span class="delete-storyline-button right" id="delete-{{storyId}}-storyline-{{id}}"><i class="material-icons grey-text text-darken-2">delete</i></span>
+                {{/if}}
+            </div>
         </div>
     </div>
     <span id="storyline-{{id}}" class="storyline">{{content}}</span>

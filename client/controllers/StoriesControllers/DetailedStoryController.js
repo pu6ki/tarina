@@ -34,7 +34,7 @@ export function DetailedStoryController(id) {
 
                     $(`#delete-${id}-storyline-${el.id}`).on('click', () => {
                         DeleteStorylineController(id, el.id);
-                    });
+                    }); 
                 });
             }
 
@@ -58,7 +58,7 @@ export function DetailedStoryController(id) {
 
             let refreshId = setInterval(() => {
                 loadStorylines(id);
-                if (window.location.href !== `${domain}/#/stories/${id}`) {
+                if (window.location.href !== `${domain}/#/stories/${id}/`) {
                     clearInterval(refreshId);
                 }
             }, 1000);
@@ -114,12 +114,16 @@ export function loadStorylines(id) {
                 let hbTemplate = Handlebars.compile(result[1]);
 
                 storylinesToLoad.forEach((el) => {
-                    el.editable = username === el.author.user.username;
+                    el.storyId = dataFromAPI.id;
+                    el.editable = username === dataFromAPI.author.user.username;
                     let template = hbTemplate(el);
                     $('.storyline-container').append(template);
                     $(`.storyline-container #storyline-${el.id}`).on('click', () => {
                         $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
                     });
+                    $(`#delete-${el.storyId}-storyline-${el.id}`).on('click', () => {
+                        DeleteStorylineController(el.storyId, el.id);
+                    }); 
                 });
             }
         })
