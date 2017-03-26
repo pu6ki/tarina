@@ -29,7 +29,10 @@ export function DetailedStoryController(id) {
             if (dataFromAPI.storyline_set) {
                 dataFromAPI.storyline_set.forEach((el) => {
                     $(`.storyline-container #storyline-${el.id}`).on('click', () => {
-                        $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
+                        $("[id^=info-container]").addClass('hide');
+
+                        $(`.storyline-container #info-container-${el.id}`).toggleClass('hide');
+                        $(`.storyline-container #info-container-${el.id}`).addClass('visible');
                     });
 
                     $(`#delete-${id}-storyline-${el.id}`).on('click', () => {
