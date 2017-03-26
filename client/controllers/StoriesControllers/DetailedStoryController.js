@@ -40,13 +40,21 @@ export function DetailedStoryController(id) {
 
             formHandler();
 
-            //$('#new-storyline').spellAsYouType();
+            $('.vote').on('click', () => {
+                $(this).removeClass('vote').addClass('unvote')
+                vote(id);
+            });
+
+
+            $('.unvote').on('click' ,() => {
+                unvote(id);
+            });
 
             $('#add-storyline').on('click', () => {
                 addStoryline(id);
             });
 
-            const domain = 'http://127.0.0.1:8080'; 
+            const domain = 'http://127.0.0.1:8080';
 
             let refreshId = setInterval(() => {
                 loadStorylines(id);
@@ -104,7 +112,7 @@ export function loadStorylines(id) {
             dataFromAPI.storyline_set = newData;
             if (storylinesToLoad.length) {
                 let hbTemplate = Handlebars.compile(result[1]);
-                
+
                 storylinesToLoad.forEach((el) => {
                     el.editable = username === el.author.user.username;
                     let template = hbTemplate(el);
@@ -114,5 +122,27 @@ export function loadStorylines(id) {
                     });
                 });
             }
+        })
+}
+
+function vote(id) {
+    const storyUrl = `http://tarina.herokuapp.com/api/story/${id}/vote/`;
+    requester.putJSON(storyUrl)
+        .then((result) => {
+            DetailedStoryController(id);
+        }).catch((err) => {
+            Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
+            console.log(err);
+        })
+}
+
+function unvote(id) {
+    const storyUrl = `http://tarina.herokuapp.com/api/story/${id}/unvote/`;
+    requester.putJSON(storyUrl)
+        .then((result) => {
+            DetailedStoryController(id);
+        }).catch((err) => {
+            Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
+            console.log(err);
         })
 }

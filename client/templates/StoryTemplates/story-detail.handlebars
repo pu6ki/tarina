@@ -31,6 +31,17 @@
                     </div>
                 {{/each}}
             </span>
+            <div class="likes-panel left-align">
+                {{#if have_voted}}
+                    <div class="blue-text">
+                        <i class="material-icons unvote">thumb_up</i>{{num_vote_up}}                    
+                    </div>
+                {{else}}
+                    <div class="black-text">
+                        <i class="material-icons vote">thumb_up</i>{{num_vote_up}}                    
+                    </div>
+                {{/if}}
+            </div>
         </div>
     </div>
 </div>

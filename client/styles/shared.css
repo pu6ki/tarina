@@ -174,3 +174,11 @@ main {
   font-style: normal;
   color: black;
 }
+
+.likes-panel {
+  margin-left: 3%;
+}
+
+.likes-panel i:hover {
+  cursor: pointer;
+}
