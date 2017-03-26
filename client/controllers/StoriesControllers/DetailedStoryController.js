@@ -40,6 +40,8 @@ export function DetailedStoryController(id) {
 
             formHandler();
 
+            //$('#new-storyline').spellAsYouType();
+
             $('#add-storyline').on('click', () => {
                 addStoryline(id);
             });
@@ -76,6 +78,7 @@ function addStoryline(id) {
     requester.postJSON(storyUrl, data)
         .then((result) => {
             Materialize.toast('Storyline added successfully.', 3000, 'green accent-4');
+            $('#new-storyline').val('');
         }).catch((err) => {
             Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
             return;

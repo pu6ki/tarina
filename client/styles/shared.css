@@ -170,3 +170,7 @@ main {
   min-height: 85vh !important;
 }
 
+#new-storyline {
+  font-style: normal;
+  color: black;
+}
