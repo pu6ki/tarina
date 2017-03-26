@@ -32,6 +32,45 @@ The app is written in Python (Django) and JavaScript mainly. It uses a number of
 * [materialize-css](https://github.com/Dogfalo/materialize) - CSS Framework based on Material design.
 
 
+## Getting started
+
+How to copy this project to your local machine and run it:
+
+1. Download a copy from GitHub:
+
+    ```
+    $ git clone https://github.com/pu6ki/tarina.git
+    $ cd tarina/
+    ```
+
+2. Setup Django requirements:
+
+    ```
+    $ pip3 install -r requirements.txt
+    $ python3 manage.py makemigrations
+    $ python3 manage.py migrate
+    ```
+
+3. Create a superuser:
+
+    ```
+    $ python3 manage.py createsuperuser
+    ```
+
+4. Run the tests:
+
+    ```
+    $ python3 manage.py test
+    ```
+
+5. Run the `live-server`:
+
+    ```
+    $ cd client/
+    $ live-server
+    ```
+
+
 ## API urls
 
 * */api/register*
