@@ -27,11 +27,12 @@ class StorySerializer(serializers.ModelSerializer):
     title = serializers.CharField(min_length=3, max_length=100)
     author = AuthorSerializer(read_only=True)
     storyline_set = StoryLineSerializer(read_only=True, many=True)
+    blacklist = AuthorSerializer(read_only=True, many=True)
 
     class Meta:
         model = Story
         fields = (
-            'id', 'title', 'author', 'posted_on', 'num_vote_up', 'storyline_set'
+            'id', 'title', 'author', 'posted_on', 'num_vote_up', 'storyline_set', 'blacklist'
         )
 
     def create(self, validated_data):
