@@ -185,3 +185,11 @@ main {
   border-radius: 30px;
   padding-top: 5px;
 }
+
+.likes-panel {
+  margin-left: 3%;
+}
+
+.likes-panel i:hover {
+  cursor: pointer;
+}

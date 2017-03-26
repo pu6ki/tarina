@@ -89,6 +89,31 @@ let requester = {
             });
         });
         return promise;
+    },
+    putJSON(url, body, options = {}) {
+        let promise = new Promise((resolve, reject) => {
+            var headers = options.headers || {};
+            $.ajax({
+                url,
+                headers,
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(body),
+                beforeSend: (xhr) => {
+                    if (window.localStorage.getItem('tarina-token')) {
+                        let token = window.localStorage.getItem('tarina-token').slice(0, 40);
+                        xhr.setRequestHeader('Authorization', `Token ${token}`);
+                    }
+                },
+                success(response) {
+                    return resolve(response);
+                },
+                error(response) {
+                    return reject(response);
+                }
+            });
+        });
+        return promise;
     }
 };
 
