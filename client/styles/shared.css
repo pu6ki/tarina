@@ -107,8 +107,8 @@ main {
 
 .visible {
   position: absolute;
-  top: -40px;
-  left: 10px;
+  top: -55px;
+  left: 30%;
   min-width: 120px;
 }
 
@@ -153,12 +153,11 @@ main {
     1px 1px 0 #000;
 }
 
-.delete-storyline-button i {
-  color: red;
+.block-user-button i, .delete-storyline-button i {
   display: inline;
 }
 
-.delete-storyline-button:hover {
+.block-user-button:hover, .delete-storyline-button, .storyline:hover {
   cursor: pointer;
 }
 
@@ -173,4 +172,16 @@ main {
 #new-storyline {
   font-style: normal;
   color: black;
+}
+
+#authorPanel {
+  background-color: white;
+  border: 2px solid #1565c0;
+  position: absolute;
+  min-width: 180px;
+  min-height: 50px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 30px;
+  padding-top: 5px;
 }
