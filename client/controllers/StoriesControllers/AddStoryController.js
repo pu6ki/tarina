@@ -59,6 +59,6 @@ function postStory() {
             Materialize.toast('Story added successfully.', 3000, 'green accent-4');
             window.location.href = `/#/stories/${result.story_id}/`;
         }).catch((err) => {
-            Materialize.toast(err.responseJSON, 3000, 'red accent-2');
+            Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
         });
 }

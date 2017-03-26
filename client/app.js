@@ -1,4 +1,5 @@
 import { controllers } from './controllers/controllers.js';
+import { loadStorylines } from './controllers/StoriesControllers/DetailedStoryController.js';
 
 const storiesUrl = 'https://tarina.herokuapp.com/api/story/';
 

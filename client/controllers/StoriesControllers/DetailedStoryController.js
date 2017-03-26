@@ -6,9 +6,11 @@ import { formHandler } from '../../utils/formHandler.js';
 import { DeleteStorylineController } from './DeleteStorylineController.js';
 import { NotFoundController } from '../NotFoundController.js';
 
+let dataFromAPI, username;
+
 export function DetailedStoryController(id) {
     let token = localStorage.getItem('tarina-token');
-    let username = localStorage.getItem('tarina-username');
+    username = localStorage.getItem('tarina-username');
     const storyUrl = `http://tarina.herokuapp.com/api/story/${id}/`;
 
     let getData = requester.getJSON(storyUrl);
@@ -16,18 +18,16 @@ export function DetailedStoryController(id) {
 
     Promise.all([getData, getTemplate])
         .then((result) => {
-            let data = result[0],
-                hbTemplate = Handlebars.compile(result[1]);
+            dataFromAPI = result[0];
+            let hbTemplate = Handlebars.compile(result[1]);
 
-            data.editable = username === data.author.user.username;
+            dataFromAPI.editable = username === dataFromAPI.author.user.username;
 
-            console.log(data);
-
-            let template = hbTemplate(data);
+            let template = hbTemplate(dataFromAPI);
             $('#content').html(template);
 
-            if (data.storyline_set) {
-                data.storyline_set.forEach((el) => {
+            if (dataFromAPI.storyline_set) {
+                dataFromAPI.storyline_set.forEach((el) => {
                     $(`.storyline-container #storyline-${el.id}`).on('click', () => {
                         $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
                     });
@@ -42,7 +42,16 @@ export function DetailedStoryController(id) {
 
             $('#add-storyline').on('click', () => {
                 addStoryline(id);
-            })
+            });
+
+            const domain = 'http://127.0.0.1:8080'; 
+
+            let refreshId = setInterval(() => {
+                loadStorylines(id);
+                if (window.location.href !== `${domain}/#/stories/${id}`) {
+                    clearInterval(refreshId);
+                }
+            }, 1000);
 
         }).catch((err) => {
             NotFoundController();
@@ -68,7 +77,39 @@ function addStoryline(id) {
         .then((result) => {
             Materialize.toast('Storyline added successfully.', 3000, 'green accent-4');
         }).catch((err) => {
-            Materialize.toast('You are not allowed to add two consecutive story lines.', 3000, 'red accent-2');
+            Materialize.toast(err.responseJSON.message, 3000, 'red accent-2');
             return;
         });
+}
+
+export function loadStorylines(id) {
+    const storylinesUrl = `http://tarina.herokuapp.com/api/story/${id}/storylines/`;
+    let getData = requester.getJSON(storylinesUrl);
+    let getTemplate = templates.get('partials/storyline');
+
+    Promise.all([getData, getTemplate])
+        .then((result) => {
+            let newData = result[0];
+            let storylinesToLoad = [];
+
+            storylinesToLoad = newData.filter((obj) => {
+                return !dataFromAPI.storyline_set.some((obj2) => {
+                    return obj.id === obj2.id;
+                });
+            });
+
+            dataFromAPI.storyline_set = newData;
+            if (storylinesToLoad.length) {
+                let hbTemplate = Handlebars.compile(result[1]);
+                
+                storylinesToLoad.forEach((el) => {
+                    el.editable = username === el.author.user.username;
+                    let template = hbTemplate(el);
+                    $('.storyline-container').append(template);
+                    $(`.storyline-container #storyline-${el.id}`).on('click', () => {
+                        $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
+                    });
+                });
+            }
+        })
 }
