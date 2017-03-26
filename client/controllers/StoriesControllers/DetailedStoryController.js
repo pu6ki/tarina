@@ -33,8 +33,10 @@ export function DetailedStoryController(id) {
                     });
 
                     $(`#delete-${id}-storyline-${el.id}`).on('click', () => {
-                        DeleteStorylineController(id, el.id);
-                    }); 
+                        alertify.confirm('Are you sure you want to delete this storyline?', () => {
+                            DeleteStorylineController(id, el.id);
+                        });
+                    });
                 });
             }
 
@@ -46,7 +48,7 @@ export function DetailedStoryController(id) {
             });
 
 
-            $('.unvote').on('click' ,() => {
+            $('.unvote').on('click', () => {
                 unvote(id);
             });
 
@@ -122,8 +124,10 @@ export function loadStorylines(id) {
                         $(`.storyline-container #info-container-${el.id}`).toggleClass('hide visible');
                     });
                     $(`#delete-${el.storyId}-storyline-${el.id}`).on('click', () => {
-                        DeleteStorylineController(el.storyId, el.id);
-                    }); 
+                        alertify.confirm('Are you sure you want to delete this storyline?', () => {
+                            DeleteStorylineController(el.storyId, el.id);
+                        });
+                    });
                 });
             }
         })
