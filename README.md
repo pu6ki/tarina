@@ -7,7 +7,7 @@
 [![Requires.io](https://requires.io/github/pu6ki/tarina/requirements.svg?branch=master&style=flat)](https://raw.githubusercontent.com/pu6ki/tarina/master/requirements.txt)
 [![Heroku](http://heroku-badge.herokuapp.com/?app=tarina&style=flat&root=/static/images/default.jpg)](https://tarina.herokuapp.com/api/register)
 
-![Logo](https://raw.githubusercontent.com/pu6ki/tarina/master/static/images/tarina_logo.jpg)
+![Logo](https://raw.githubusercontent.com/pu6ki/tarina/master/client/images/tarina_logo.jpg)
 
 
 # tarina
