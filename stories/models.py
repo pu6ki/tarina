@@ -28,6 +28,7 @@ class StoryLine(models.Model):
 
     class Meta:
         ordering = ['posted_on']
+        unique_together = ('story', 'content')
 
     def __str__(self):
         return 'Story line #{} - {}'.format(self.id, self.story)
