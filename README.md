@@ -1,10 +1,3 @@
-**[Presentation link](http://slides.com/wencakisa/deck-bf2f9da1-e12c-4bc1-ac1e-ee0258892e95/fullscreen)**
-
-[![GitHub stars](https://img.shields.io/github/stars/pu6ki/tarina.svg?style=flat)](https://github.com/pu6ki/tarina/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/pu6ki/tarina.svg?style=flat)](https://github.com/pu6ki/tarina/network)
-[![GitHub issues](https://img.shields.io/github/issues/pu6ki/tarina.svg?style=flat)](https://github.com/pu6ki/tarina/issues)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
-[![Requires.io](https://requires.io/github/pu6ki/tarina/requirements.svg?branch=master&style=flat)](https://raw.githubusercontent.com/pu6ki/tarina/master/requirements.txt)
 [![Heroku](http://heroku-badge.herokuapp.com/?app=tarina&style=flat&root=/static/images/default.jpg)](https://tarina.herokuapp.com/api/register)
 
 ![Logo](https://raw.githubusercontent.com/pu6ki/tarina/master/client/images/tarina_logo.jpg)
