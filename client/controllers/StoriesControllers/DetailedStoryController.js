@@ -63,7 +63,7 @@ export function DetailedStoryController(id) {
 
             let refreshId = setInterval(() => {
                 loadStorylines(id);
-                if (window.location.href !== `${domain}/#/stories/${id}/`) {
+                if (window.location.href !== `${domain}/#/stories/${id}`) {
                     clearInterval(refreshId);
                 }
             }, 1000);
