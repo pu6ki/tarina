@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from django.conf import settings
 
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
@@ -9,7 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import StorySerializer, StoryLineSerializer
 from .models import Story, StoryLine
-from .permissions import IsAuthor, IsNotBlacklisted
+from .permissions import (
+    IsAuthor, IsNotBlacklisted,
+    IsNotLastStoryLineAuthor, IsNotFullOfStoryLines
+)
 
 
 class StoriesViewSet(viewsets.ModelViewSet):
@@ -103,7 +105,10 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': (IsAuthenticated,),
         'retrieve': (IsAuthenticated,),
-        'create': (IsAuthenticated, IsNotBlacklisted),
+        'create': (
+            IsAuthenticated, IsNotBlacklisted,
+            IsNotLastStoryLineAuthor, IsNotFullOfStoryLines
+        ),
         'destroy': (IsAuthenticated, IsAuthor),
     }
     serializer_class = StoryLineSerializer
@@ -148,23 +153,6 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
     def create(self, request, story_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=story_pk)
         self.check_object_permissions(request, story)
-
-        story_lines = StoryLine.objects.filter(story=story)
-        user_story_lines = story_lines.filter(author=request.user.author)
-
-        if story_lines:
-            msg = ''
-
-            if story_lines.last() == user_story_lines.last():
-                msg = 'You are not allowed to add two consecutive story lines.'
-            elif story_lines.count() == settings.MAX_STORYLINES:
-                msg = 'Max number of story lines reached ({}).'.format(settings.MAX_STORYLINES)
-
-            if msg:
-                return Response(
-                    {'message': msg},
-                    status=status.HTTP_403_FORBIDDEN
-                )
 
         context = {'request': request, 'story': story}
 
