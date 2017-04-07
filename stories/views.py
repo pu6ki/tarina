@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
@@ -156,10 +157,8 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
 
             if story_lines.last() == user_story_lines.last():
                 msg = 'You are not allowed to add two consecutive story lines.'
-            elif story_lines.filter(content=request.data['content']):
-                msg = 'Identical story line already exists.'
-            elif len(story_lines) == 30:
-                msg = 'Max number of stories reached.'
+            elif story_lines.count() == settings.MAX_STORYLINES:
+                msg = 'Max number of story lines reached ({}).'.format(settings.MAX_STORYLINES)
 
             if msg:
                 return Response(
