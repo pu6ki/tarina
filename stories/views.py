@@ -184,92 +184,71 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         )
 
 
-class StoryVoting(generics.UpdateAPIView):
+class StoryVotingView(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsNotBlacklisted)
 
-    def get_error_message(self):
-        unvote_msg = 'You haven\'t voted for this story yet.'
-        vote_msg = 'You have already voted for this story.'
-
-        return unvote_msg if self.get_view_name().endswith('Unvote') else vote_msg
-
-    def update(self, request, pk=None, *args, **kwargs):
+    def perform_action(self, user_id, story):
         raise NotImplementedError()
 
-
-class StoryVote(StoryVoting):
     def update(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
         self.check_object_permissions(request, story)
 
-        user_id = request.user.id
+        self.perform_action(request.user.id, story)
 
-        if story.votes.exists(user_id):
-            return Response(
-                {'message': self.get_error_message()},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response(
+            {'num_vote_up': story.votes.count()},
+            status=status.HTTP_200_OK
+        )
 
+
+class StoryVote(StoryVotingView):
+    def perform_action(self, user_id, story):
         story.votes.up(user_id)
 
-        return Response(
-            {'num_vote_up': story.votes.count()},
-            status=status.HTTP_200_OK
-        )
 
-
-class StoryUnvote(StoryVoting):
-    def update(self, request, pk=None, *args, **kwargs):
-        story = get_object_or_404(Story, id=pk)
-        self.check_object_permissions(request, story)
-
-        user_id = request.user.id
-
-        if not story.votes.exists(user_id):
-            return Response(
-                {'message': self.get_error_message()},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+class StoryUnvote(StoryVotingView):
+    def perform_action(self, user_id, story):
         story.votes.delete(user_id)
-
-        return Response(
-            {'num_vote_up': story.votes.count()},
-            status=status.HTTP_200_OK
-        )
 
 
 class UserBlockingView(generics.UpdateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsAuthor)
 
-    def get_response_message(self, user):
-        return 'User {} has been successfuly {}.'.format(
-            user,
-            'blocked' if self.get_view_name().endswith('Block') else 'unblocked'
-        )
+    err_msg_format = 'User {} is {}.'
+    resp_msg_format = 'User {} has been successfully {}.'
 
-    def update(self, request, pk=None, user_pk=None, *args, **kwargs):
+    def get_error_message(self, user):
         raise NotImplementedError()
 
+    def get_response_message(self, user):
+        raise NotImplementedError()
 
-class UserBlock(UserBlockingView):
+    def can_perform_action(self, user, story):
+        raise NotImplementedError()
+
+    def get_users_queryset(self, story=None):
+        raise NotImplementedError()
+
+    def perform_action(self, user, story):
+        raise NotImplementedError()
+
     def update(self, request, pk=None, user_pk=None, *args, **kwargs):
         story = get_object_or_404(Story, id=pk)
 
-        users = User.objects.exclude(id=story.author.user.pk)
-        user = get_object_or_404(users, id=user_pk)
+        user = get_object_or_404(self.get_users_queryset(story), id=user_pk)
 
         self.check_object_permissions(request, story)
 
-        if user in story.blacklist.all():
+        if not self.can_perform_action(user, story):
             return Response(
-                {'message': 'User is already blocked.'},
+                {'message': self.get_error_message(user)},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        story.blacklist.add(user)
+        self.perform_action(user, story)
 
         return Response(
             {'message': self.get_response_message(user)},
@@ -278,21 +257,34 @@ class UserBlock(UserBlockingView):
 
 
 class UserUnblock(UserBlockingView):
-    def update(self, request, pk=None, user_pk=None, *args, **kwargs):
-        story = get_object_or_404(Story, id=pk)
-        user = get_object_or_404(User, id=user_pk)
+    def get_error_message(self, user):
+        return self.err_msg_format.format(user, 'not blocked yet')
 
-        self.check_object_permissions(request, story)
+    def get_response_message(self, user):
+        return self.resp_msg_format.format(user, 'unblocked')
 
-        if user not in story.blacklist.all():
-            return Response(
-                {'message': 'User is not blocked yet.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    def can_perform_action(self, user, story):
+        return user in story.blacklist.all()
 
+    def get_users_queryset(self, story=None):
+        return User.objects.all()
+
+    def perform_action(self, user, story):
         story.blacklist.remove(user)
 
-        return Response(
-            {'message': self.get_response_message(user)},
-            status=status.HTTP_200_OK
-        )
+
+class UserBlock(UserUnblock):
+    def get_error_message(self, user):
+        return self.err_msg_format.format(user, 'already blocked')
+
+    def get_response_message(self, user):
+        return self.resp_msg_format.format(user, 'blocked')
+
+    def can_perform_action(self, user, story):
+        return not super().can_perform_action(user, story)
+
+    def get_users_queryset(self, story=None):
+        return super().get_users_queryset(story=story).exclude(id=story.author.user.id)
+
+    def perform_action(self, user, story):
+        story.blacklist.add(user)
