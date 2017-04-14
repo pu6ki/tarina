@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
 
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -62,15 +61,23 @@ class UserLogin(generics.CreateAPIView):
         return Response(resp_data, status=status.HTTP_200_OK, headers=headers)
 
 
-class AuthorProfile(generics.RetrieveAPIView):
+class AuthorProfile(generics.RetrieveUpdateAPIView):
     serializer_class = AuthorSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def retrieve(self, request, user_pk=None, *args, **kwargs):
-        user = get_object_or_404(User, id=user_pk)
-        author = get_object_or_404(Author, user=user)
+        author = get_object_or_404(Author, user__id=user_pk)
 
         serializer = self.serializer_class(author)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, user_pk=None):
+        author = get_object_or_404(Author, user__id=user_pk)
+
+        serializer = self.serializer_class(author, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)

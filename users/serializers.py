@@ -67,9 +67,24 @@ class UserReadSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    user = UserReadSerializer(read_only=True)
+    user = UserReadSerializer()
     profile_image = serializers.URLField()
 
     class Meta:
         model = Author
         fields = ('user', 'profile_image')
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.get('user', {})
+        username = user_data.get('username', '')
+
+        if User.objects.exclude(pk=instance.user.pk).filter(username=username).exists():
+            raise serializers.ValidationError('User with this username already exists.')
+
+        instance.user.__dict__.update(**user_data)
+        instance.user.save()
+
+        instance.__dict__.update(**validated_data)
+        instance.save()
+
+        return instance
