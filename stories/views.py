@@ -76,25 +76,28 @@ class StoriesViewSet(viewsets.ModelViewSet):
         )
 
 
-class PersonalStoryList(generics.ListAPIView):
+class CategoryStoryList(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = StorySerializer
 
-    def get(self, request):
-        stories = Story.objects.filter(author=request.user.author)
-        serializer = self.serializer_class(stories, many=True)
+    def get_stories(self, request, category):
+        stories = {
+            'personal': Story.objects.filter(author=request.user.author),
+            'trending': Story.objects.order_by('-num_vote_up', '-posted_on')[:10]
+        }
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return stories.get(category)
 
+    def get(self, request, *args, **kwargs):
+        stories = self.get_stories(request, kwargs['category'])
 
-class TrendingStoryList(generics.ListAPIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = StorySerializer
+        if not stories:
+            return Response(
+                {'message': 'Invalid category.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-    def get(self, request):
-        stories = Story.objects.order_by('-num_vote_up', '-posted_on')[:10]
         serializer = self.serializer_class(stories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -106,8 +109,7 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         'list': (IsAuthenticated,),
         'retrieve': (IsAuthenticated,),
         'create': (
-            IsAuthenticated, IsNotBlacklisted,
-            IsNotLastStoryLineAuthor, IsNotFullOfStoryLines
+            IsAuthenticated, IsNotBlacklisted, IsNotLastStoryLineAuthor, IsNotFullOfStoryLines
         ),
         'destroy': (IsAuthenticated, IsAuthor),
     }
