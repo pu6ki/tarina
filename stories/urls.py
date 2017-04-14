@@ -3,7 +3,7 @@ from django.conf.urls import url
 from rest_framework_nested import routers
 
 from .views import (
-    StoriesViewSet, PersonalStoryList, TrendingStoryList, StoryLinesViewSet,
+    StoriesViewSet, CategoryStoryList, StoryLinesViewSet,
     StoryVote, StoryUnvote,
     UserBlock, UserUnblock
 )
@@ -21,24 +21,19 @@ storylines_router.register(
 
 urlpatterns = [
     url(
-        r'^story/personal/', PersonalStoryList.as_view(), name='personal'
+        r'^story/(?P<category>[a-z]+)/$', CategoryStoryList.as_view(), name='category-list'
     ),
     url(
-        r'^story/trending/', TrendingStoryList.as_view(), name='trending'
+        r'^story/(?P<pk>[0-9]+)/vote/$', StoryVote.as_view(), name='vote'
     ),
     url(
-        r'^story/(?P<pk>[0-9]+)/vote/', StoryVote.as_view(), name='vote'
+        r'^story/(?P<pk>[0-9]+)/unvote/$', StoryUnvote.as_view(), name='unvote'
     ),
     url(
-        r'^story/(?P<pk>[0-9]+)/unvote/', StoryUnvote.as_view(), name='unvote'
+        r'^story/(?P<pk>[0-9]+)/block/(?P<user_pk>[0-9]+)/$', UserBlock.as_view(), name='block'
     ),
     url(
-        r'^story/(?P<pk>[0-9]+)/block/(?P<user_pk>[0-9]+)/',
-        UserBlock.as_view(),
-        name='block'
-    ),
-    url(
-        r'^story/(?P<pk>[0-9]+)/unblock/(?P<user_pk>[0-9]+)/',
+        r'^story/(?P<pk>[0-9]+)/unblock/(?P<user_pk>[0-9]+)/$',
         UserUnblock.as_view(),
         name='unblock'
     )
