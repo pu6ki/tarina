@@ -92,7 +92,7 @@ class CategoryStoryList(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         stories = self.get_stories(request, kwargs['category'])
 
-        if not stories:
+        if stories is None:
             return Response(
                 {'message': 'Invalid category.'},
                 status=status.HTTP_400_BAD_REQUEST
