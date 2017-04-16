@@ -71,7 +71,7 @@ class StoriesViewSet(viewsets.ModelViewSet):
         story.delete()
 
         return Response(
-            {'message': 'Story successfuly deleted.'},
+            {'message': 'Story successfully deleted.'},
             status=status.HTTP_200_OK
         )
 

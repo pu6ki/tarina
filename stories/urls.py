@@ -9,6 +9,8 @@ from .views import (
 )
 
 
+app_name = 'stories'
+
 story_router = routers.SimpleRouter()
 story_router.register(r'story', StoriesViewSet, base_name='story')
 
