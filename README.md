@@ -66,18 +66,19 @@ How to copy this project to your local machine and run it:
 
 ## API urls
 
-* */api/register*
-* */api/login*
-* */api/profile/{user_id}* - Profile view.
-* */api/story* - List of all stories.
-* */api/story/personal* - Personal story list.
-* */api/story/{story_id}* - Story detail.
-* */api/story/{story_id}/storylines* - Story lines of a story.
-* */api/story/{story_id}/storylines/{storyline_id}* - See a certain story line.
-* */api/story/{story_id}/vote* - Vote for a story.
-* */api/story/{story_id}/unvote*
-* */api/story/{story_id}/block/{user_id}* - Block user from posting story lines.
-* */api/story/{story_id}/unblock/{user_id}*
+* /api/register
+* /api/login
+* /api/profile/{user_id} - *Profile view.*
+* /api/story - *List of all stories.*
+* /api/story/personal - *Personal story list.*
+* /api/story/trending - *Trending stories.*
+* /api/story/{story_id} - *Story detail.*
+* /api/story/{story_id}/storylines - *Story lines of a story.*
+* /api/story/{story_id}/storylines/{storyline_id} - *See a certain story line.*
+* /api/story/{story_id}/vote - *Vote for a story.*
+* /api/story/{story_id}/unvote*
+* /api/story/{story_id}/block/{user_id} - *Block user from posting story lines.*
+* /api/story/{story_id}/unblock/{user_id}
 
 
 ### License
