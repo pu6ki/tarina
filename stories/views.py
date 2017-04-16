@@ -181,7 +181,7 @@ class StoryLinesViewSet(viewsets.ModelViewSet):
         story_line.delete()
 
         return Response(
-            {'message': 'Story line successfuly deleted.'},
+            {'message': 'Story line successfully deleted.'},
             status=status.HTTP_200_OK
         )
 
