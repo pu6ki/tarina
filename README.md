@@ -84,7 +84,7 @@ How to copy this project to your local machine and run it:
 ## TODOs
 
 * [ ] Add tests for author profile updating.
-* [ ] Implement story lines tests.
+* [x] Implement story lines tests.
 
 
 ### License
