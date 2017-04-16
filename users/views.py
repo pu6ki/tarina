@@ -75,7 +75,6 @@ class AuthorProfile(generics.RetrieveUpdateAPIView):
 
     def update(self, request, user_pk=None):
         author = get_object_or_404(Author, user__id=user_pk)
-        News.objects.create()
 
         serializer = self.serializer_class(author, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)

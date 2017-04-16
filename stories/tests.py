@@ -195,7 +195,6 @@ class StoryLinesViewSetTests(APITestCase):
     def test_story_line_detail_with_invalid_story_id(self):
         pass
 
-    # Well...
     def test_story_line_detail_with_valid_story_id_and_invalid_story_line_id(self):
         pass
 
