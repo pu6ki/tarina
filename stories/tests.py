@@ -73,6 +73,24 @@ class StoriesViewSetTests(APITestCase):
 
         self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    def test_story_creation_with_too_short_title(self):
+        self.client.force_authenticate(user=self.user)
+
+        self.request_body['title'] = 'ya'
+        response = self.client.post(reverse(self.list_view_name), self.request_body, format='json')
+
+        self.assertEqual(response.data['title'], ['Ensure this field has at least 3 characters.'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_story_creation_with_too_long_title(self):
+        self.client.force_authenticate(user=self.user)
+
+        self.request_body['title'] = 'test' * 30
+        response = self.client.post(reverse(self.list_view_name), self.request_body, format='json')
+
+        self.assertEqual(response.data['title'], ['Ensure this field has no more than 100 characters.'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_story_creation_with_authorized_user(self):
         self.client.force_authenticate(user=self.user)
@@ -156,3 +174,69 @@ class CategoryStoryListViewTests(APITestCase):
         self.assertEqual(response.data[0]['title'], self.story1.title)
         self.assertEqual(response.data[1]['title'], self.story2.title)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class StoryLinesViewSetTests(APITestCase):
+    def setUp(self):
+        pass
+
+    def test_story_line_list_with_unauthorized_user(self):
+        pass
+
+    def test_story_line_list_with_invalid_story_id(self):
+        pass
+
+    def test_story_line_list_with_valid_story_id(self):
+        pass
+
+    def test_story_line_detail_with_unauthorized_user(self):
+        pass
+
+    def test_story_line_detail_with_invalid_story_id(self):
+        pass
+
+    # Well...
+    def test_story_line_detail_with_valid_story_id_and_invalid_story_line_id(self):
+        pass
+
+    def test_story_line_detail_with_valid_ids(self):
+        pass
+
+    def test_story_line_creation_with_unauthorized_user(self):
+        pass
+    
+    def test_story_line_creation_with_invalid_story_id(self):
+        pass
+    
+    def test_story_line_creation_with_too_short_content(self):
+        pass
+    
+    def test_story_line_creation_with_too_long_content(self):
+        pass
+
+    def test_story_line_creation_with_blacklisted_author(self):
+        pass
+    
+    def test_story_line_creation_when_request_user_is_last_author(self):
+        pass
+
+    def test_story_line_creation_when_story_is_full_of_story_lines(self):
+        pass
+
+    def test_story_line_creation_with_valid_data(self):
+        pass
+
+    def test_story_line_deletion_with_unauthorized_user(self):
+        pass
+
+    def test_story_line_deletion_with_invalid_story_id(self):
+        pass
+
+    def test_story_line_deletion_with_valid_story_id_and_invalid_story_line_id(self):
+        pass
+    
+    def test_story_line_deletion_of_another_user(self):
+        pass
+
+    def test_story_line_deletion_with_valid_user(self):
+        pass
