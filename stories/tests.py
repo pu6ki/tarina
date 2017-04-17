@@ -472,3 +472,61 @@ class StoryLinesViewSetTests(APITestCase):
 
         self.assertEqual(response.data['message'], 'Story line successfully deleted.')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class StoryVotingTests(APITestCase):
+    def setUp(self):
+        pass
+
+    def test_voting_with_unauthorized_user(self):
+        pass
+    
+    def test_voting_with_authorized_user(self):
+        pass
+
+    def test_unvoting_with_unauthorized_user(self):
+        pass
+
+    def test_unvoting_with_authorized_user(self):
+        pass
+
+
+class UserBlockingTests(APITestCase):
+    def setUp(self):
+        pass
+
+    def test_user_block_with_unauthorized_user(self):
+        pass
+
+    def test_user_block_when_request_user_is_not_author(self):
+        pass
+
+    def test_user_block_with_invalid_user_id(self):
+        pass
+
+    def test_user_block_when_user_is_already_blocked(self):
+        pass
+
+    def test_user_block_with_same_user(self):
+        pass
+
+    def test_user_block_with_valid_unblocked_user(self):
+        pass
+
+    def test_user_unblock_with_unauthorized_user(self):
+        pass
+
+    def test_user_unblock_when_request_user_is_not_author(self):
+        pass
+
+    def test_user_unblock_with_invalid_user_id(self):
+        pass
+
+    def test_user_unblock_when_user_is_not_blocked_yet(self):
+        pass
+
+    def test_user_unblock_with_same_user(self):
+        pass
+
+    def test_user_unblock_with_valid_blocked_user(self):
+        pass
