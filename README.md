@@ -81,12 +81,6 @@ How to copy this project to your local machine and run it:
 * /api/story/{story_id}/unblock/{user_id}
 
 
-## TODOs
-
-* [ ] Add tests for author profile updating.
-* [x] Implement story lines tests.
-
-
 ### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
