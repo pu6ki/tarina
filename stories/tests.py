@@ -6,11 +6,16 @@ from rest_framework.test import APITestCase
 
 from users.models import Author
 from .models import Story, StoryLine
+from .permissions import IsNotBlacklisted, IsNotLastStoryLineAuthor
 
 
 HTTP_MESSAGES = {
     401: 'Authentication credentials were not provided.',
-    403: 'You do not have permission to perform this action.',
+    403: {
+        'default': 'You do not have permission to perform this action.',
+        'blacklisted': IsNotBlacklisted().message,
+        'last_author': IsNotLastStoryLineAuthor().message
+    },
     404: 'Not found.'
 }
 
@@ -34,8 +39,10 @@ class StoriesViewSetTests(APITestCase):
     def test_story_list_with_unauthorized_user(self):
         response = self.client.get(reverse(self.list_view_name))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_list_with_authorized_user(self):
         self.client.force_authenticate(user=self.user)
@@ -48,8 +55,10 @@ class StoriesViewSetTests(APITestCase):
     def test_story_detail_with_unauthorized_user(self):
         response = self.client.get(reverse(self.detail_view_name, kwargs={'pk': self.story.id}))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_detail_with_authorized_user(self):
         self.client.force_authenticate(user=self.user)
@@ -64,14 +73,18 @@ class StoriesViewSetTests(APITestCase):
 
         response = self.client.get(reverse(self.detail_view_name, kwargs={'pk': self.story.id + 1}))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_creation_with_unauthorized_user(self):
         response = self.client.post(reverse(self.list_view_name), self.request_body, format='json')
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_creation_with_too_short_title(self):
         self.client.force_authenticate(user=self.user)
@@ -105,8 +118,10 @@ class StoriesViewSetTests(APITestCase):
     def test_story_deletion_with_unauthorized_user(self):
         response = self.client.delete(reverse(self.detail_view_name, kwargs={'pk': self.story.id}))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_deletion_of_another_user(self):
         self.client.force_authenticate(user=self.user)
@@ -117,8 +132,12 @@ class StoriesViewSetTests(APITestCase):
 
         response = self.client.delete(reverse(self.detail_view_name, kwargs={'pk': self.story.id}))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        status_code = response.status_code
+
+        self.assertEqual(
+            response.data['detail'], HTTP_MESSAGES[status_code]['default']
+        )
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_deletion_with_valid_user(self):
         self.client.force_authenticate(user=self.user)
@@ -145,8 +164,10 @@ class CategoryStoryListViewTests(APITestCase):
     def test_category_list_with_unauthorized_user(self):
         response = self.client.get(reverse(self.view_name, kwargs={'category': 'test'}))
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_category_list_with_invalid_category(self):
         self.client.force_authenticate(user=self.user)
@@ -172,6 +193,7 @@ class CategoryStoryListViewTests(APITestCase):
         self.story2.num_vote_up += 1
         self.story1.save()
         self.story2.save()
+
         response = self.client.get(reverse(self.view_name, kwargs={'category': 'trending'}))
 
         self.assertEqual(response.data[0]['title'], self.story1.title)
@@ -218,8 +240,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_line_list_with_invalid_story_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -230,8 +254,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_list_with_valid_story_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -257,8 +283,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_line_detail_with_invalid_story_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -273,8 +301,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_detail_with_valid_story_id_and_invalid_story_line_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -289,8 +319,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_detail_with_valid_ids(self):
         self.client.force_authenticate(user=self.user1)
@@ -313,8 +345,10 @@ class StoryLinesViewSetTests(APITestCase):
             data={'content': 'All eyez on me.'}
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_line_creation_with_invalid_story_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -324,8 +358,10 @@ class StoryLinesViewSetTests(APITestCase):
             data={'content': 'All eyez on me.'}
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_creation_with_too_short_content(self):
         self.client.force_authenticate(user=self.user1)
@@ -364,10 +400,12 @@ class StoryLinesViewSetTests(APITestCase):
             data={'content': 'for your eyez only!'}
         )
 
+        status_code = response.status_code
+
         self.assertEqual(
-            response.data['detail'], 'You are not allowed to contribute to this story anymore.'
+            response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted']
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_line_creation_when_request_user_is_last_author(self):
         self.client.force_authenticate(user=self.user2)
@@ -377,10 +415,12 @@ class StoryLinesViewSetTests(APITestCase):
             data={'content': 'for your eyez only!'}
         )
 
+        status_code = response.status_code
+
         self.assertEqual(
-            response.data['detail'], 'You are not allowed to add two consecutive story lines.'
+            response.data['detail'], HTTP_MESSAGES[status_code]['last_author']
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_line_creation_when_story_is_full_of_story_lines(self):
         pass
@@ -406,8 +446,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_story_line_deletion_with_invalid_story_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -422,8 +464,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_deletion_with_valid_story_id_and_invalid_story_line_id(self):
         self.client.force_authenticate(user=self.user1)
@@ -438,8 +482,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_story_line_deletion_when_request_user_is_not_story_author(self):
         self.client.force_authenticate(user=self.user2)
@@ -454,8 +500,10 @@ class StoryLinesViewSetTests(APITestCase):
             )
         )
 
-        self.assertEqual(response.data['detail'], HTTP_MESSAGES[response.status_code])
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['default'])
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_line_deletion_with_valid_user(self):
         self.client.force_authenticate(user=self.user1)
@@ -476,19 +524,113 @@ class StoryLinesViewSetTests(APITestCase):
 
 class StoryVotingTests(APITestCase):
     def setUp(self):
-        pass
+        self.vote_view_name = 'stories:vote'
+        self.unvote_view_name = 'stories:unvote'
+
+        self.user = User.objects.create(
+            username='DAMN',
+            password='straightouttacompton',
+            first_name='Kendrick',
+            last_name='Lamar'
+        )
+        self.blocked_user = User.objects.create(
+            username='Millenium',
+            password='alwaysonyourmind',
+            first_name='Lifeline',
+            last_name='Ontheline'
+        )
+        self.author = Author.objects.create(user=self.user)
+        self.story = Story.objects.create(title='Church', author=self.author)
+        self.story.blacklist.add(self.blocked_user)
+        self.story.save()
 
     def test_voting_with_unauthorized_user(self):
-        pass
-    
+        response = self.client.put(
+            reverse(self.vote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_voting_when_user_is_blocked(self):
+        self.client.force_authenticate(user=self.blocked_user)
+
+        response = self.client.put(
+            reverse(self.vote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(
+            response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted']
+        )
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_voting_with_invalid_story_id(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.put(
+            reverse(self.vote_view_name, kwargs={'pk': self.story.id + 1})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
+
     def test_voting_with_authorized_user(self):
-        pass
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.put(
+            reverse(self.vote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['num_vote_up'], 1)
+        self.assertEqual(status_code, status.HTTP_200_OK)
 
     def test_unvoting_with_unauthorized_user(self):
-        pass
+        response = self.client.put(
+            reverse(self.unvote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_unvoting_with_invalid_story_id(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.put(
+            reverse(self.unvote_view_name, kwargs={'pk': self.story.id + 1})
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
+
 
     def test_unvoting_with_authorized_user(self):
-        pass
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.put(
+            reverse(self.vote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        self.assertEqual(response.data['num_vote_up'], 1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.put(
+            reverse(self.unvote_view_name, kwargs={'pk': self.story.id})
+        )
+
+        self.assertEqual(response.data['num_vote_up'], 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class UserBlockingTests(APITestCase):
