@@ -134,9 +134,7 @@ class StoriesViewSetTests(APITestCase):
 
         status_code = response.status_code
 
-        self.assertEqual(
-            response.data['detail'], HTTP_MESSAGES[status_code]['default']
-        )
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['default'])
         self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_deletion_with_valid_user(self):
@@ -402,9 +400,7 @@ class StoryLinesViewSetTests(APITestCase):
 
         status_code = response.status_code
 
-        self.assertEqual(
-            response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted']
-        )
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted'])
         self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_line_creation_when_request_user_is_last_author(self):
@@ -417,9 +413,7 @@ class StoryLinesViewSetTests(APITestCase):
 
         status_code = response.status_code
 
-        self.assertEqual(
-            response.data['detail'], HTTP_MESSAGES[status_code]['last_author']
-        )
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['last_author'])
         self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_story_line_creation_when_story_is_full_of_story_lines(self):
@@ -563,9 +557,7 @@ class StoryVotingTests(APITestCase):
 
         status_code = response.status_code
 
-        self.assertEqual(
-            response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted']
-        )
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['blacklisted'])
         self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_voting_with_invalid_story_id(self):
@@ -614,7 +606,6 @@ class StoryVotingTests(APITestCase):
         self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
         self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
-
     def test_unvoting_with_authorized_user(self):
         self.client.force_authenticate(user=self.user)
 
@@ -635,40 +626,252 @@ class StoryVotingTests(APITestCase):
 
 class UserBlockingTests(APITestCase):
     def setUp(self):
-        pass
+        self.block_view_name = 'stories:block'
+        self.unblock_view_name = 'stories:unblock'
+
+        self.author_user = User.objects.create(
+            username='DAMN',
+            password='straightouttacompton',
+            first_name='Kendrick',
+            last_name='Lamar'
+        )
+        self.user_to_block = User.objects.create(
+            username='FEEL',
+            password='tellmewhatyoudoforlove',
+            first_name='Capture',
+            last_name='Ledabe'
+        )
+        self.dummy_user = User.objects.create(
+            username='test',
+            password='melodieseverywherearoundme',
+            first_name='Dummy',
+            last_name='User'
+        )
+        self.author = Author.objects.create(user=self.author_user)
+        self.story = Story.objects.create(title='Church', author=self.author)
 
     def test_user_block_with_unauthorized_user(self):
-        pass
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_block_when_request_user_is_not_author(self):
-        pass
+        self.client.force_authenticate(user=self.dummy_user)
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['default'])
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_block_with_invalid_user_id(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id + 3
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_user_block_when_user_is_already_blocked(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        self.story.blacklist.add(self.user_to_block)
+        self.story.save()
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(
+            response.data['message'],
+            'User {} is already blocked.'.format(self.user_to_block.username)
+        )
+        self.assertEqual(status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_block_with_same_user(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.author_user.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_user_block_with_valid_unblocked_user(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        self.assertEqual(
+            response.data['message'],
+            'User {} has been successfully blocked.'.format(self.user_to_block.username)
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_unblock_with_unauthorized_user(self):
-        pass
+        response = self.client.put(
+            reverse(
+                self.unblock_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_unblock_when_request_user_is_not_author(self):
-        pass
+        self.client.force_authenticate(user=self.dummy_user)
+
+        response = self.client.put(
+            reverse(
+                self.unblock_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code]['default'])
+        self.assertEqual(status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_unblock_with_invalid_user_id(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.unblock_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id + 3
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(status_code, status.HTTP_404_NOT_FOUND)
 
     def test_user_unblock_when_user_is_not_blocked_yet(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.unblock_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(
+            response.data['message'],
+            'User {} is not blocked yet.'.format(self.user_to_block.username)
+        )
+        self.assertEqual(status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_unblock_with_same_user(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        response = self.client.put(
+            reverse(
+                self.block_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.author_user.id
+                }
+            )
+        )
+
+        status_code = response.status_code
+
+        self.assertEqual(response.data['detail'], HTTP_MESSAGES[status_code])
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_user_unblock_with_valid_blocked_user(self):
-        pass
+        self.client.force_authenticate(user=self.author_user)
+
+        self.story.blacklist.add(self.user_to_block)
+        self.story.save()
+
+        response = self.client.put(
+            reverse(
+                self.unblock_view_name,
+                kwargs={
+                    'pk': self.story.id,
+                    'user_pk': self.user_to_block.id
+                }
+            )
+        )
+
+        self.assertEqual(
+            response.data['message'],
+            'User {} has been successfully unblocked.'.format(self.user_to_block.username)
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
